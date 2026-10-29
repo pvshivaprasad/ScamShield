@@ -1,0 +1,9 @@
+services:
+  - type: web
+    name: scamshield
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements.txt && python train.py
+    startCommand: uvicorn api:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /api/health
+    autoDeploy: true
