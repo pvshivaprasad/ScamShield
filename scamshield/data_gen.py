@@ -1,4 +1,4 @@
-"""Build training data from the public SMS spam TSV plus synthetic India-style examples."""
+"""Build training data from a local SMS Spam Collection TSV plus synthetic India-style examples."""
 from pathlib import Path
 import pandas as pd
 ROOT=Path(__file__).resolve().parent.parent
@@ -6,7 +6,7 @@ ROOT=Path(__file__).resolve().parent.parent
 def load_real():
     path=ROOT/"data"/"sms_spam_raw.tsv"
     if not path.exists():
-        raise FileNotFoundError(f"Required training data not found: {path}")
+        raise FileNotFoundError(f"Required training data not found: {path}. Place the SMS Spam Collection TSV at data/sms_spam_raw.tsv.")
     df=pd.read_csv(path,sep="\t",header=None,names=["label","text"],encoding="latin-1",on_bad_lines="skip")
     df=df.dropna(subset=["text"])
     df["label"]=(df["label"].astype(str).str.strip().str.lower().isin(["spam","1","scam"])).astype(int)
@@ -43,9 +43,9 @@ def synthetic(n_each=600,seed=42):
     urls=["http://verify-account.example.test","https://claim-prize.example.test","http://kyc-update.example.test"]
     money=["Rs 499","Rs 2500","Rs 15000","Rs 750"]
     rows=[]
-    for i in range(n_each):
-      rows.append((r.choice(scams).format(url=r.choice(urls),money=r.choice(money),digits=r.randint(1000,9999)),1,"synthetic"))
-      rows.append((r.choice(safe).format(url=r.choice(urls),money=r.choice(money),digits=r.randint(1000,9999)),0,"synthetic"))
+    for _ in range(n_each):
+        rows.append((r.choice(scams).format(url=r.choice(urls),money=r.choice(money),digits=r.randint(1000,9999)),1,"synthetic"))
+        rows.append((r.choice(safe).format(url=r.choice(urls),money=r.choice(money),digits=r.randint(1000,9999)),0,"synthetic"))
     return pd.DataFrame(rows,columns=["text","label","source"])
 
 def build():
