@@ -27,7 +27,7 @@ def load_real(required=True):
     df = df.dropna(subset=["text"])
     df["label"] = (
         df["label"].astype(str).str.strip().str.lower().isin(["spam", "1", "scam"])
-    ).astype(int)
+    ).astype("int64")
     df["source"] = "real"
     return df[["text", "label", "source"]]
 
@@ -99,4 +99,7 @@ def build():
         )
     df = pd.concat([real, synthetic()], ignore_index=True)
     df["text"] = df["text"].astype(str).str.strip()
+    # Concatenating an empty real-data frame can leave labels with object dtype.
+    # scikit-learn requires discrete numeric classes, so normalize labels explicitly.
+    df["label"] = pd.to_numeric(df["label"], errors="raise").astype("int64")
     return df.drop_duplicates(subset=["text"]).reset_index(drop=True)
