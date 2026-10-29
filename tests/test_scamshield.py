@@ -1,4 +1,4 @@
-from scamshield.rules import analyze,rule_score
+from scamshield.rules import analyze, rule_score
 
 def test_kyc_threat_signal():
     signals=analyze("URGENT your SBI account will be blocked today. Complete KYC immediately at https://example.test")
